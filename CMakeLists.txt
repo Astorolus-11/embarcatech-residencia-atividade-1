@@ -35,7 +35,9 @@ pico_sdk_init()
 
 # Add executable. Default name is the project name, version 0.1
 
-add_executable(embarcatech-residencia-atividade-1 embarcatech-residencia-atividade-1.c )
+add_executable(embarcatech-residencia-atividade-1 embarcatech-residencia-atividade-1.c ssd1306.c)
+
+pico_generate_pio_header(embarcatech-residencia-atividade-1 ${CMAKE_CURRENT_LIST_DIR}/matriz_leds.pio)
 
 pico_set_program_name(embarcatech-residencia-atividade-1 "embarcatech-residencia-atividade-1")
 pico_set_program_version(embarcatech-residencia-atividade-1 "0.1")
@@ -46,6 +48,11 @@ pico_enable_stdio_usb(embarcatech-residencia-atividade-1 1)
 
 # Add the standard library to the build
 target_link_libraries(embarcatech-residencia-atividade-1
+        hardware_i2c
+        pico_time
+        hardware_pio
+        hardware_clocks
+        hardware_adc
         pico_stdlib)
 
 # Add the standard include files to the build
