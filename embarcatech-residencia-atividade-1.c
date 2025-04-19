@@ -92,9 +92,9 @@ int main()
        sprintf(strx,"%d",valor_x);
        sprintf(stry,"%d",valor_y);
        ssd1306_draw_string(&ssd,"x",2,54);
-       ssd1306_draw_string(&ssd,strx,11,54);
-       ssd1306_draw_string(&ssd,"y", 83, 54);
-       ssd1306_draw_string(&ssd,stry,92,54);
+       ssd1306_draw_string(&ssd,strx,19,54);
+       ssd1306_draw_string(&ssd,"y", 65, 54);
+       ssd1306_draw_string(&ssd,stry,82,54);
        ssd1306_vline(&ssd,64,54,61,true);
        
        ssd1306_send_data(&ssd);
