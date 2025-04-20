@@ -56,17 +56,17 @@ double desenho[4][25]={
          0.0, 0.1, 0.1, 0.1, 0.0,
          0.0, 0.0, 0.0, 0.0, 0.0},
 
-         {0.1, 0.1, 0.1, 0.1, 0.1,
-          0.1, 0.1, 0.1, 0.1, 0.1,
-          0.1, 0.1, 0.1, 0.1, 0.1,
-          0.1, 0.1, 0.1, 0.1, 0.1,
-          0.1, 0.1, 0.1, 0.1, 0.1},
+        {0.1, 0.1, 0.1, 0.1, 0.1,
+         0.1, 0.1, 0.1, 0.1, 0.1,
+         0.1, 0.1, 0.1, 0.1, 0.1,
+         0.1, 0.1, 0.1, 0.1, 0.1,
+         0.1, 0.1, 0.1, 0.1, 0.1},
 
-          {0.0, 0.1, 0.0, 0.1, 0.0,
-           0.1, 0.1, 0.1, 0.1, 0.1,
-           0.0, 0.1, 0.0, 0.1, 0.0,
-           0.1, 0.1, 0.1, 0.1, 0.1,
-           0.0, 0.1, 0.0, 0.1, 0.0},
+        {0.0, 0.1, 0.0, 0.1, 0.0,
+         0.1, 0.1, 0.1, 0.1, 0.1,
+         0.0, 0.1, 0.0, 0.1, 0.0,
+         0.1, 0.1, 0.1, 0.1, 0.1,
+         0.0, 0.1, 0.0, 0.1, 0.0},
 
         
 };
@@ -144,12 +144,16 @@ void setup (){
     gpio_init(led_vermelho);
     gpio_init(botao_a);
     gpio_init(botao_b);
+    gpio_init(buzzer_a);
+    gpio_init(buzzer_b);
     //Definindo como entrada/saida:
     gpio_set_dir(led_verde, GPIO_OUT);
     gpio_set_dir(led_azul, GPIO_OUT);
     gpio_set_dir(led_vermelho, GPIO_OUT);
     gpio_set_dir(botao_a, GPIO_IN);
     gpio_set_dir(botao_b, GPIO_IN);
+    gpio_set_dir(buzzer_a, GPIO_OUT);
+    gpio_set_dir(buzzer_b, GPIO_OUT);
     //Habilitando o pull-up dos botões:
     gpio_pull_up(botao_a);
     gpio_pull_up(botao_b);
@@ -166,23 +170,23 @@ void gpio_irq_handler(uint gpio, uint32_t events){
             //Incrementa e altera a animação:
             escolha++;
             bastate=!bastate;
-            gpio_put(buzzer_a,bbstate);
+            gpio_put(buzzer_a,bastate);
 
-            if(escolha%2==0){
+            if(escolha%2==0){ //ok
                 gstate=!gstate;
                 gpio_put(led_verde,gstate);
 
             }
-            else if(escolha%2!=0){
+            else if(escolha%2!=0){ //ok
                 bstate=!bstate;
                 gpio_put(led_azul,bstate);
 
             }
-            else if(escolha%3==0){
+            else if(escolha%3==0){ //ok
                 rstate=!rstate;
                 gpio_put(led_vermelho,rstate);
             }
-            if(escolha%5==0){
+            if(escolha%5==0){ //ok
                 rstate=!rstate;
                 gpio_put(led_vermelho,rstate);
                 bstate=!bstate;
@@ -199,21 +203,21 @@ void gpio_irq_handler(uint gpio, uint32_t events){
             bbstate=!bbstate;
             gpio_put(buzzer_b,bbstate);
 
-            if(escolha%2==0){
+            if(escolha%2==0){ //ok
                 gstate=!gstate;
                 gpio_put(led_verde,gstate);
 
             }
-            else if(escolha%2!=0){
+            else if(escolha%2!=0){ //ok
                 bstate=!bstate;
                 gpio_put(led_azul,bstate);
 
             }
-            else if(escolha%3==0){
+            else if(escolha%3==0){ //ok
                 rstate=!rstate;
                 gpio_put(led_vermelho,rstate);
             }
-            if(escolha%5==0){
+            if(escolha%5==0){ //ok
                 rstate=!rstate;
                 gpio_put(led_vermelho,rstate);
                 bstate=!bstate;
@@ -223,7 +227,7 @@ void gpio_irq_handler(uint gpio, uint32_t events){
             }
             
         }
-        
+    
     }
 
 
