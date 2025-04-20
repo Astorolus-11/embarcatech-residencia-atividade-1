@@ -32,23 +32,51 @@ const uint endereco = 0x3C; //Endereço do display SSD1306
 //Variáveis globais:
 static volatile uint32_t last_time = 0; 
 ssd1306_t ssd;
-
-
-
+uint pixels = 25;
+uint escolha = 0;
 
 //Protótipos das funções:
 void setup();
 static void gpio_irq_handler(uint gpio, uint32_t events);
 void adc_setup();
 void i²c_setup();
+uint32_t intensidade(double g, double r, double b);
+void animacao(uint escolha);
+//Frames:
+double desenho[4][25]={
+        {0.0, 0.0, 0.0, 0.0, 0.0,
+         0.0, 0.0, 0.0, 0.0, 0.0,
+         0.0, 0.0, 0.1, 0.0, 0.0,
+         0.0, 0.0, 0.0, 0.0, 0.0,
+         0.0, 0.0, 0.0, 0.0, 0.0},
 
+        {0.0, 0.0, 0.0, 0.0, 0.0,
+         0.0, 0.1, 0.1, 0.1, 0.0,
+         0.0, 0.1, 0.1, 0.1, 0.0,
+         0.0, 0.1, 0.1, 0.1, 0.0,
+         0.0, 0.0, 0.0, 0.0, 0.0},
 
+         {0.1, 0.1, 0.1, 0.1, 0.1,
+          0.1, 0.1, 0.1, 0.1, 0.1,
+          0.1, 0.1, 0.1, 0.1, 0.1,
+          0.1, 0.1, 0.1, 0.1, 0.1,
+          0.1, 0.1, 0.1, 0.1, 0.1},
+
+          {0.0, 0.1, 0.0, 0.1, 0.0,
+           0.1, 0.1, 0.1, 0.1, 0.1,
+           0.0, 0.1, 0.0, 0.1, 0.0,
+           0.1, 0.1, 0.1, 0.1, 0.1,
+           0.0, 0.1, 0.0, 0.1, 0.0},
+
+        
+};
 
 
 
 //Função principal:
 int main()
-{
+{   
+    bool clk;
     //Chamada das funções de configuração:
     setup();
     adc_setup();
@@ -61,12 +89,14 @@ int main()
     statemachine = pio_claim_unused_sm(pio,true);
     matriz_leds_program_init(pio, statemachine, offset,pin_matriz);
 
+    clk=set_sys_clock_khz(128000,false);
+    if(clk){ // Se o clock de 128000 foi habilitado com sucesso
+        printf("Clock definido: %ld\n",clock_get_hz(clk_sys));
+    }
+
     //Interrupções para os botões:
     gpio_set_irq_enabled_with_callback(botao_a,GPIO_IRQ_EDGE_FALL,true,&gpio_irq_handler);
     gpio_set_irq_enabled_with_callback(botao_b,GPIO_IRQ_EDGE_FALL,true,&gpio_irq_handler);
-    
-    
-    
     
     
     while (true) {
@@ -98,7 +128,9 @@ int main()
        ssd1306_vline(&ssd,64,54,61,true);
        
        ssd1306_send_data(&ssd);
+       animacao(escolha);
        sleep_ms(10);
+
     }
 }
 
@@ -124,18 +156,74 @@ void setup (){
 }
 
 void gpio_irq_handler(uint gpio, uint32_t events){
-
+    static bool bastate=false,bbstate=false,gstate=false,bstate=false,rstate=false;
     uint32_t tempo_atual = to_us_since_boot(get_absolute_time()); //Tempo atual desde o inicio do sistema
 
     if(tempo_atual-last_time>200000){
         last_time = tempo_atual; //Atualiza o last time
 
         if(gpio_get(botao_a)==0){ //Rotina para o botão A
+            //Incrementa e altera a animação:
+            escolha++;
+            bastate=!bastate;
+            gpio_put(buzzer_a,bbstate);
+
+            if(escolha%2==0){
+                gstate=!gstate;
+                gpio_put(led_verde,gstate);
+
+            }
+            else if(escolha%2!=0){
+                bstate=!bstate;
+                gpio_put(led_azul,bstate);
+
+            }
+            else if(escolha%3==0){
+                rstate=!rstate;
+                gpio_put(led_vermelho,rstate);
+            }
+            if(escolha%5==0){
+                rstate=!rstate;
+                gpio_put(led_vermelho,rstate);
+                bstate=!bstate;
+                gpio_put(led_azul,bstate);
+                gstate=!gstate;
+                gpio_put(led_verde,gstate);
+            }
+            
 
         }
         if(gpio_get(botao_b)==0){ //Rotina para o botão B
+            //Decrementa e altera a animação:
+            escolha--;
+            bbstate=!bbstate;
+            gpio_put(buzzer_b,bbstate);
 
+            if(escolha%2==0){
+                gstate=!gstate;
+                gpio_put(led_verde,gstate);
+
+            }
+            else if(escolha%2!=0){
+                bstate=!bstate;
+                gpio_put(led_azul,bstate);
+
+            }
+            else if(escolha%3==0){
+                rstate=!rstate;
+                gpio_put(led_vermelho,rstate);
+            }
+            if(escolha%5==0){
+                rstate=!rstate;
+                gpio_put(led_vermelho,rstate);
+                bstate=!bstate;
+                gpio_put(led_azul,bstate);
+                gstate=!gstate;
+                gpio_put(led_verde,gstate);
+            }
+            
         }
+        
     }
 
 
@@ -171,3 +259,120 @@ void i²c_setup(){
     ssd1306_config(&ssd);
     ssd1306_send_data(&ssd);
 }
+uint32_t intensidade(double g, double r, double b){
+    unsigned char G,B,R;
+    G = g*255;
+    B = b*255;
+    R = r*255;
+
+    return (G<<24) | (R<<16) | (B<<8);
+}
+void animacao(uint escolha){
+    
+
+    if(escolha==0){
+        
+        
+        for(int i=0;i<pixels;i++){
+            
+            valor_led= intensidade(desenho[0][i],0.0,0.0);
+            pio_sm_put_blocking(pio,statemachine,valor_led);
+    
+        }
+
+    }
+    else if(escolha==1){
+
+        for(int i=0;i<pixels;i++){
+            if(i!=12){
+            valor_led= intensidade(0.0,desenho[1][i],0.0);
+            
+
+            }
+            else{
+                valor_led= intensidade(desenho[1][i],0.0,0.0);
+
+            }
+            pio_sm_put_blocking(pio,statemachine,valor_led);
+            
+    
+        }
+
+    }
+    else if(escolha==2){
+
+        for(int i=0;i<pixels;i++){
+        
+            if(i==12){
+            valor_led= intensidade(desenho[2][i],0.0,0.0);
+            
+
+            }
+            if( i==5 || i==9 || i==10 || i==14 || i==15 || i==19){
+                valor_led= intensidade(0.0,0.0,desenho[2][i]);
+
+            }
+            if(i>=0 && i<=5 ||i>=20 && i<=24){
+                valor_led= intensidade(0.0,0.0,desenho[2][i]);
+            }
+            if(i>=6&&i<=8 || i>=16 && i<18 || i==11 || i==13){
+                valor_led= intensidade(0.0,desenho[2][i],0.0);
+
+            }
+            pio_sm_put_blocking(pio,statemachine,valor_led);
+            
+    
+        }
+
+    }
+    else if(escolha==3){
+
+        for(int i=0;i<pixels;i++){
+            if(i>=5 &&i<=9 || i>=15 && i<=19){
+                valor_led=intensidade(0.0,0.0,desenho[3][i]);
+            }
+            else{
+                valor_led=intensidade(0.0,desenho[3][i],0.0);
+                
+            }
+            pio_sm_put_blocking(pio,statemachine,valor_led);
+            
+        }
+    }
+    else if(escolha%2==0){
+        for(int i=0;i<pixels;i++){
+            if(i>=5 &&i<=9 || i>=15 && i<=19){
+                valor_led=intensidade(0.0,desenho[3][i],0.0);
+            }
+            else{
+                valor_led=intensidade(0.0,0.0,desenho[3][i]);
+               
+                
+            }
+            pio_sm_put_blocking(pio,statemachine,valor_led);
+            
+        }
+    }
+    else if(escolha%2!=0){
+        for(int i=0;i<pixels;i++){
+            if(i>=5 &&i<=9 || i>=15 && i<=19){
+                valor_led=intensidade(0.0,0.0,desenho[3][i]);
+            }
+            else{
+                valor_led=intensidade(0.0,desenho[3][i],0.0);
+                
+               
+                
+            }
+            pio_sm_put_blocking(pio,statemachine,valor_led);
+            
+        }
+    }
+    
+    }    
+    
+
+
+
+
+
