@@ -1,4 +1,4 @@
-# Pequeno projeto para revisar o conteudo aprendido na capacitação do Embarcatech em Sistemas Embarcados
+# Pequeno projeto para revisar o conteúdo aprendido na capacitação do Embarcatech em Sistemas Embarcados
 
 
 ## 1. Propósito
