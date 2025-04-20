@@ -72,6 +72,7 @@ Os componentes utilizados presentes na placa foram:
 
 
 ## 6. Vídeo de demonstração
+https://www.dropbox.com/scl/fi/ows3kavn9et9ko1wz7qwl/Atividade-1-Residencia-Embarcatech-Feito-com-o-Clipchamp.mp4?rlkey=rfg81zhjgmpeck86abxnfsr4t&st=1m48rjfo&dl=0
 
 
 
